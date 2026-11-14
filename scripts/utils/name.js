@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const FALLBACK_NAME = "tiktok-skill";
+const FALLBACK_NAME = "tt-watch";
 
 let cached = null;
 function skillName() {
