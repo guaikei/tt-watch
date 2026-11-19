@@ -50,7 +50,7 @@
 
 ## 4. ⚡ 30 秒上手
 
-> **前置（只需做一次）**：到 [TikTok舆情监测说明](https://www.guaikei.com) 自助开通 Token，然后配置环境变量：
+> **前置（只需做一次）**：到 [TikTok 舆情监控分析接口](https://www.guaikei.com) 自助开通 Token，然后配置环境变量：
 >
 > ```bash
 > # Windows
@@ -107,8 +107,8 @@ node scripts/tiktok/comment-cli.js --url "https://www.tiktok.com/@username/video
 - **输出**：stdout 纯 JSON（统一信封：`status` / `error_code` / `request` / `metadata` / `results`），日志与进度走 stderr
 - **退出码**：`0` 成功（含空结果和 `--help`）/ `2` 参数或关键词不合法 / `1` 链接、网络、超时或接口错误 / `3` Token 异常
 - **参数校验**：排序、时间、数量不在允许范围内时直接失败，不会改成默认值再请求
-- **稳定性**：创建最多重试 3 次；查询最多 20 次，只有「处理中」会继续等，整段等待大约 15 分钟。单次请求超时 20 秒。429 和 5xx 会重试，Token 与明确业务错误不重试
-- **日志留存**：默认不写文件。需要留底时设置 `TT_GUAIKEI_ENABLE_LOG=1`，文件在系统临时目录。POSIX 上仅当前用户可读写；Windows 靠用户目录隔离
+- **稳定性**：创建最多重试 3 次；查询最多 20 次，只有「处理中」会继续等，整段等待大约 15 分钟。单次请求超时 20 秒。网络 / 429 / 5xx 及部分瞬时失败（如查价、插入）会内部重试；`AUTH_*`、`PLAN_LIMIT`、`INSUFFICIENT_BALANCE`、`RATE_LIMITED`、`DAILY_LIMIT` 等明确业务错误不重试
+- **日志留存**：默认不写文件。需要留底时加 `--save` 或设置 `GUAIKEI_ENABLE_LOG=1`，文件在系统临时目录。POSIX 上仅当前用户可读写；Windows 靠用户目录隔离。旧变量 `TT_GUAIKEI_ENABLE_LOG` 已废弃
 - **字段规范**：`assets/` 下提供输出信封和 6 份入参/出参 JSON Schema（draft-07）
 
 ---
@@ -176,7 +176,7 @@ A：技能侧硬上限仍是 10000 条/次（按量 Token）。**包月 Token** 
 <details>
 <summary><b>Q：日志文件在哪？</b></summary>
 
-A：默认不写文件。需要留底时先设置 `TT_GUAIKEI_ENABLE_LOG=1`，成功后 stderr 会打印"已保存到 …"，路径为系统临时目录下的 `tiktok-guaikei/logs/<日期>/`。
+A：默认不写文件。需要留底时加 `--save` 或设置 `GUAIKEI_ENABLE_LOG=1`，成功后 stderr 会打印"已保存到 …"，路径为系统临时目录下的 `tiktok-guaikei/logs/<日期>/`。旧变量 `TT_GUAIKEI_ENABLE_LOG` 已废弃。
 
 </details>
 
@@ -199,7 +199,7 @@ A：支持。stdout 是纯 JSON、退出码语义明确，可直接被脚本或 
 ## 9. 💳 计费与支持
 
 - **计费**：按 API 调用量计费，官方渠道开通，用量透明可查；**失败调用不计费**。按量单次最多 10000；包月搜索/作品最多 30、评论最多 40，超限为 `PLAN_LIMIT`。
-- **开通 / 支持**：[TikTok舆情监控套餐页](https://www.guaikei.com) 自助开通 Token，并查阅使用帮助。
+- **开通 / 支持**：[TikTok 舆情数据API使用文档](https://www.guaikei.com) 自助开通 Token，并查阅使用帮助。
 - **更新日志**：[references/changelog.md](references/changelog.md)
 
 ---
