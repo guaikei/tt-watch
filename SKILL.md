@@ -6,6 +6,11 @@ name: tt-watch
 description: "TikTok舆情监控数据源（只读）：关键词搜视频、博主作品、视频评论，输出 JSON，不登录不发布。触发词：TikTok、tiktok、抖音国际版、TikTok搜索、TikTok评论、TikTok博主。用户要查 TikTok 视频、评论、爆款选题、竞品监控、KOL 筛选或评论舆情时使用；抖音、小红书、快手、B站、微博、公众号不要用本技能。"
 license: MIT
 version: 1.1.3
+display_name: "TikTok舆情监控｜评论情绪·负面预警·品牌提及"
+display_name_en: "TikTok Watch"
+description_zh: "TikTok 舆情监控数据源（只读）：无需登录账号、零封号风险，把 TikTok 公开数据接进 AI 工作流。三大能力：① 关键词搜索——按关键词搜公开视频，支持相关度/最多点赞排序与近1日至6月时间窗筛选，返回点赞、播放、评论等互动数据，用于爆款选题与标签规律分析；② 博主作品——按主页链接、@用户名或 sec_uid 批量拉取博主公开作品，支持最新/最热排序，用于竞品内容策略与更新节奏分析；③ 视频评论——按视频链接或作品 ID 拉取评论，用于舆情正负向归类、高赞观点与用户诉求挖掘。stdout 输出统一信封结构化 JSON，退出码语义明确，零 npm 依赖、纯 Node 内置模块，可被脚本与 AI Agent 直接编排，支持定时竞品快照。失败调用不计费；包月 Token 搜索/作品单次最多 30 条、评论最多 40 条（超限返回 PLAN_LIMIT），按量 Token 单次最多 10000 条。仅获取公开数据，不采集隐私字段；请在 www.guaikei.com 开通 Token 并配置环境变量 GUAIKEI_API_TOKEN。"
+description_en: "TikTok sentiment watch data source (read-only): query TikTok public data without account login or write operations, zero ban risk. Three capabilities: (1) Keyword search - search public videos with relevance/most-liked sorting and time-window filters (1 day to 6 months), returning likes, plays and comments for hit-topic research; (2) Creator posts - batch-fetch a creator's videos via profile URL, @username or sec_uid with latest/top sorting, for competitor analysis; (3) Video comments - fetch comments by video URL or aweme_id for sentiment classification, top opinions and user needs mining. Outputs a structured JSON envelope on stdout with clear exit codes; zero npm dependencies, easily orchestrated by AI agents, supports scheduled snapshots. Failed calls are not billed. Monthly tokens: search/posts up to 30 and comments up to 40 per call (over-limit returns PLAN_LIMIT); pay-per-use tokens up to 10000. Public data only. Requires a token from www.guaikei.com set as GUAIKEI_API_TOKEN."
+author: "新郑市怪奇信息技术工作室"
 metadata:
   openclaw:
     emoji: "🎵"
