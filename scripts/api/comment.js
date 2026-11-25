@@ -1,6 +1,6 @@
 const constants = require("../config/constants");
 const { requestApi, pollTaskResult } = require("../utils/request");
-const { pickCost } = require("../utils/cost");
+const { pickCost, pickTaskId } = require("../utils/cost");
 const { SkillError } = require("../utils/errors");
 const { formatCreateTime } = require("../utils/time");
 const { profileUrl } = require("../validate/url");
@@ -20,8 +20,11 @@ function processCommentResults(data) {
   return out;
 }
 
+/**
+ * @returns {Promise<string|undefined>} Create 成功时的任务 id（uuid）
+ */
 async function createCommentTask(token, url, limit) {
-  return await requestApi(
+  const response = await requestApi(
     "POST",
     "/api/tiktok/comment/url",
     { _: Date.now() },
@@ -30,12 +33,18 @@ async function createCommentTask(token, url, limit) {
     constants.CREATE_MAX_ATTEMPTS,
     "创建任务",
   );
+  return pickTaskId(response);
 }
 
-async function getCommentTask(token, url, limit) {
+/**
+ * @param {string} [taskId] Create 返回的任务 id；有则查询只传 id（不带业务字段）
+ * @returns {Promise<{ results: Array, cost?: number }>}
+ */
+async function getCommentTask(token, url, limit, taskId) {
+  const params = taskId ? { id: taskId } : { url, limit };
   const response = await pollTaskResult(
     "/api/tiktok/comment/info",
-    { url, limit },
+    params,
     token,
     "查询任务",
   );

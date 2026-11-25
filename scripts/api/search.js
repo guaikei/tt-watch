@@ -1,6 +1,6 @@
 const constants = require("../config/constants");
 const { requestApi, pollTaskResult } = require("../utils/request");
-const { pickCost } = require("../utils/cost");
+const { pickCost, pickTaskId } = require("../utils/cost");
 const { SkillError } = require("../utils/errors");
 const { formatCreateTime } = require("../utils/time");
 const { profileUrl } = require("../validate/url");
@@ -20,8 +20,11 @@ function processSearchResults(data) {
   return out;
 }
 
+/**
+ * @returns {Promise<string|undefined>} Create 成功时的任务 id（uuid）；缺失则查询仅带业务字段
+ */
 async function createSearchTask(token, keyword, sort, time, limit) {
-  return await requestApi(
+  const response = await requestApi(
     "POST",
     "/api/tiktok/search/keyword",
     { _: Date.now() },
@@ -35,17 +38,25 @@ async function createSearchTask(token, keyword, sort, time, limit) {
     constants.CREATE_MAX_ATTEMPTS,
     "创建任务",
   );
+  return pickTaskId(response);
 }
 
-async function getSearchTask(token, keyword, sort, time, limit) {
+/**
+ * @param {string} [taskId] Create 返回的任务 id；有则查询只传 id（不带业务字段）
+ * @returns {Promise<{ results: Array, cost?: number }>}
+ */
+async function getSearchTask(token, keyword, sort, time, limit, taskId) {
+  const params = taskId
+    ? { id: taskId }
+    : {
+        keyword,
+        sort_type: sort,
+        publish_time: time,
+        limit,
+      };
   const response = await pollTaskResult(
     "/api/tiktok/search/info",
-    {
-      keyword,
-      sort_type: sort,
-      publish_time: time,
-      limit,
-    },
+    params,
     token,
     "查询任务",
   );

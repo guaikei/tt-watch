@@ -5,7 +5,7 @@ slug: tt-watch
 name: tt-watch
 description: "TikTok舆情监控数据源（只读）：关键词搜视频、博主作品、视频评论，输出 JSON，不登录不发布。触发词：TikTok、tiktok、抖音国际版、TikTok搜索、TikTok评论、TikTok博主。用户要查 TikTok 视频、评论、爆款选题、竞品监控、KOL 筛选或评论舆情时使用；抖音、小红书、快手、B站、微博、公众号不要用本技能。"
 license: MIT
-version: 1.1.3
+version: 1.1.4
 display_name: "TikTok舆情监控｜评论情绪·负面识别·品牌提及"
 display_name_en: "TikTok Watch"
 description_zh: "TikTok 舆情监控数据源（只读）：无需登录账号、零封号风险，把 TikTok 公开数据接进 AI 工作流。三大能力：① 关键词搜索——按关键词搜公开视频，支持相关度/最多点赞排序与近1日至6月时间窗筛选，返回点赞、播放、评论等互动数据，用于爆款选题与标签规律分析；② 博主作品——按主页链接、@用户名或 sec_uid 批量拉取博主公开作品，支持最新/最热排序，用于竞品内容策略与更新节奏分析；③ 视频评论——按视频链接或作品 ID 拉取评论，用于舆情正负向归类、高赞观点与用户诉求挖掘。stdout 输出统一信封结构化 JSON，退出码语义明确，零 npm 依赖、纯 Node 内置模块，可被脚本与 AI Agent 直接编排，支持定时竞品快照。失败调用不计费；包月 Token 搜索/作品单次最多 30 条、评论最多 40 条（超限返回 PLAN_LIMIT），按量 Token 单次最多 10000 条。仅获取公开数据，不采集隐私字段；请在 www.guaikei.com 开通 Token 并配置环境变量 GUAIKEI_API_TOKEN。"
@@ -13,50 +13,27 @@ description_en: "TikTok sentiment watch data source (read-only): query TikTok pu
 author: "新郑市怪奇信息技术工作室"
 metadata:
   openclaw:
-    emoji: "🎵"
     primaryEnv: GUAIKEI_API_TOKEN
     requires:
       bins:
         - node
       env:
         - GUAIKEI_API_TOKEN
-  enabled: true
   type: command
-  runtime: "nodejs@16.14.0+"
   requires:
     bins: ["node"]
     env: ["GUAIKEI_API_TOKEN"]
-  env_desc:
-    GUAIKEI_API_TOKEN: "TikTok 数据 API 访问令牌。未配置时无法调用接口；可通过 https://www.guaikei.com 开通并获取支持。"
-  keywords:
-    - "TikTok"
-    - "tiktok"
-    - "抖音国际版"
+  tags:
     - "TikTok搜索"
     - "TikTok评论"
     - "TikTok博主"
+    - "博主作品"
+    - "抖音国际版"
     - "爆款选题"
     - "竞品分析"
     - "评论舆情"
-  category:
-    - "Integrations"
-    - "Research"
-    - "数据分析"
-    - "内容创作"
-    - "商业运营"
-  tags:
-    - "TikTok"
-    - "tiktok"
-    - "抖音国际版"
-    - "关键词搜索"
-    - "视频评论"
-    - "博主作品"
-    - "竞品分析"
-    - "选题调研"
-    - "舆情分析"
-    - "爆款挖掘"
     - "KOL筛选"
-    - "海外短视频"
+    - "tiktok"
   schemas:
     - name: "输出信封"
       file: "assets/output_envelope.schema.json"
@@ -73,12 +50,9 @@ metadata:
     - name: "评论出参"
       file: "assets/comment_cli_resp.schema.json"
   examples:
-    - "帮我搜 TikTok 上 AI 点赞最多的视频 → node scripts/tiktok/search-cli.js --keyword \"AI\" --sort 1 --limit 20"
-    - "最近一周 TikTok 的 AI model，要 20 条 → node scripts/tiktok/search-cli.js --keyword \"AI model\" --time 7 --limit 20"
-    - "这个 TikTok 博主最近 30 条作品 → node scripts/tiktok/post-cli.js --url \"https://www.tiktok.com/@username\" --sort 0 --limit 30"
-    - "这个 TikTok 博主什么最火 → node scripts/tiktok/post-cli.js --url \"https://www.tiktok.com/@username\" --sort 1 --limit 30"
-    - "这条 TikTok 视频评论区在说什么，帮我归纳舆情 → node scripts/tiktok/comment-cli.js --url \"https://www.tiktok.com/@username/video/1234567890123456789\" --limit 40"
-    - "盯一下这个竞品账号最近发了什么 → node scripts/tiktok/post-cli.js --url \"https://www.tiktok.com/@competitor\" --limit 10"
+    - "帮我搜 TikTok 上 AI 点赞最多的视频 → node \"<SKILL_ROOT>/scripts/tiktok/search-cli.js\" --keyword \"AI\" --sort 1 --limit 20"
+    - "这个 TikTok 博主最近 30 条作品 → node \"<SKILL_ROOT>/scripts/tiktok/post-cli.js\" --url \"https://www.tiktok.com/@username\" --sort 0 --limit 30"
+    - "这条 TikTok 视频评论区在说什么，帮我归纳舆情 → node \"<SKILL_ROOT>/scripts/tiktok/comment-cli.js\" --url \"https://www.tiktok.com/@username/video/1234567890123456789\" --limit 40"
 ---
 
 # 🎵 TikTok舆情监控 · 功能列表 (TikTok Sentiment Watch)
@@ -97,8 +71,8 @@ metadata:
 
 ## 0. 🧭 每次按这个顺序执行
 
-1. 确认环境变量 `GUAIKEI_API_TOKEN` 已配置。没有配置时直接告诉用户去 [TikTok 舆情监测数据API](https://www.guaikei.com) 开通，不要先跑一遍试探。
-2. 在本技能根目录执行 `node scripts/tiktok/<命令>.js`（或用绝对路径，见 [references/faq.md](references/faq.md)）。
+1. 确认环境变量 `GUAIKEI_API_TOKEN` 已配置。没有配置时直接告诉用户去 [TikTok 实时监控分析API](https://www.guaikei.com) 开通，不要先跑一遍试探。
+2. **用绝对路径执行**：`node "<SKILL_ROOT>/scripts/tiktok/<命令>.js" …`。`<SKILL_ROOT>` = 含本 `SKILL.md` 的那一层真实目录（以当前会话为准；勿套用其它宿主示例路径，勿用 frontmatter `name` 冒充目录名）。已 `cd` 到技能根时可用相对路径 `node scripts/tiktok/…`（见 [references/faq.md](references/faq.md)）。
 3. stderr 出现「处理中」表示任务还在跑。等进程自己退出，再读 stdout 的最后一份 JSON。不要把 stderr 或整份 JSON 念给用户。
 4. 按「4. 📦 读结果」的退出码表决定：改参数再试、告诉用户，或停止。
 5. **Windows 拼参：cmd 只用双引号**包含空格/中文/URL 的参数；不要用 bash 单引号。引号仍拆坏 → 改用 `--json-args`（[faq.md](references/faq.md)）。Windows / 弱模型优先 `--json-args`。
@@ -154,18 +128,18 @@ metadata:
 
 ## 3. 🎛️ 参数
 
-枚举和数量不在允许范围内时，命令直接失败（退出码 2，`INVALID_ARGS`），不会改成默认值再请求。三个命令都支持 `--help` / `-h`：帮助打在 stderr，退出码 0，stdout 为空。短参数大小写都可以。含空格的关键词用双引号包成一个参数。关键词以 `-` 开头时写成 `--keyword=-AI`，或 `node scripts/tiktok/search-cli.js -- -AI`。完整字段见 `assets/*_cli_req.schema.json` 与 [references/options.md](references/options.md)。**Windows**：cmd **只用双引号**；仍拆坏或弱模型 → `--json-args`。双壳例与绝对路径 → [references/faq.md](references/faq.md)。
+枚举和数量不在允许范围内时，命令直接失败（退出码 2，`INVALID_ARGS`），不会改成默认值再请求。三个命令都支持 `--help` / `-h`：帮助打在 stderr，退出码 0，stdout 为空。短参数大小写都可以。含空格的关键词用双引号包成一个参数。关键词以 `-` 开头时写成 `--keyword=-AI`，或 `node "<SKILL_ROOT>/scripts/tiktok/search-cli.js" -- -AI`。完整字段见 `assets/*_cli_req.schema.json` 与 [references/options.md](references/options.md)。**Windows**：cmd **只用双引号**；仍拆坏或弱模型 → `--json-args`。双壳例与绝对路径 → [references/faq.md](references/faq.md)。
 
-**Windows 双壳（同一条搜索，先 cd 到技能目录）**：
+**Windows 双壳（同一条搜索；把 `<SKILL_ROOT>` 换成真实技能根）**：
 
 ```bat
 REM cmd —— 不要用单引号
-node scripts\tiktok\search-cli.js --keyword "AI tutorial" --sort 1 --limit 20
+node "<SKILL_ROOT>\scripts\tiktok\search-cli.js" --keyword "AI tutorial" --sort 1 --limit 20
 ```
 
 ```powershell
 # PowerShell
-node scripts/tiktok/search-cli.js --keyword "AI tutorial" --sort 1 --limit 20
+node "<SKILL_ROOT>/scripts/tiktok/search-cli.js" --keyword "AI tutorial" --sort 1 --limit 20
 ```
 
 **套餐双上限（重要）**：技能侧硬上限为 10000（按量 Token）。**包月 Token** 超限会返回 `PLAN_LIMIT`（后端 errcode 14），不要当网络错误重试：搜索/作品最多 **30**，评论最多 **40**。具体以官网与本次 `message` 为准。
@@ -196,7 +170,7 @@ node scripts/tiktok/search-cli.js --keyword "AI tutorial" --sort 1 --limit 20
 
 ## 4. 📦 读结果
 
-成功、空结果、失败都是同一份信封。只读 stdout 的最后一份 JSON。`--help` 时 stdout 为空，帮助在 stderr。字段以 `assets/output_envelope.schema.json` 和 `assets/*_cli_resp.schema.json` 为准。取数成功/empty 时信封顶层可能有 `cost`（花费估算：包月为 `1`，按次为条数×单价）；错误响应无此字段。
+成功、空结果、失败都是同一份信封。只读 stdout 的最后一份 JSON。`--help` 时 stdout 为空，帮助在 stderr。字段以 `assets/output_envelope.schema.json` 和 `assets/*_cli_resp.schema.json` 为准。取数成功/empty 时信封顶层可能有 `cost`（花费估算：包月为 `1`，按次为条数×单价）；错误响应无此字段。上游 Create `id` → `/info` 只传 `id` 的约定见 [contract.md](references/contract.md)（不影响 CLI 信封）。
 
 ```json
 {
@@ -205,7 +179,7 @@ node scripts/tiktok/search-cli.js --keyword "AI tutorial" --sort 1 --limit 20
   "message": "搜索任务完成",
   "timestamp": "2026/10/26 16:20:00",
   "request": { "command": "search", "keyword": "AI", "sort": 1, "time": 0, "limit": 20 },
-  "metadata": { "skill_version": "1.1.3", "runtime_version": "22.22.2", "execution_time": 8421 },
+  "metadata": { "skill_version": "1.1.4", "runtime_version": "22.22.2", "execution_time": 8421 },
   "results": [{ "aweme_id": "123", "desc": "...", "digg_count": 100 }],
   "cost": 0.08
 }
@@ -225,15 +199,14 @@ node scripts/tiktok/search-cli.js --keyword "AI tutorial" --sort 1 --limit 20
 | 0 | `OK` / `NO_MATCH` | 没有结果就告诉用户没有匹配内容，不要当成失败重试 |
 | 2 | `INVALID_ARGS` / `INVALID_KEYWORD` | 按上一节改参数后再试一次。关键词是链接时改走作品或评论 |
 | 1 | `INVALID_URL` | 按路由换命令，或向用户要标准链接。短链不要改命令再试 |
-| 3 | `AUTH_REQUIRED` / `AUTH_ERROR` | 停止重试，让用户配置 `GUAIKEI_API_TOKEN` |
+| 3 | `AUTH_REQUIRED` / `AUTH_ERROR` | 停止重试；引导官网检查/开通/续期 TOKEN（含停用业务码 410 Gone、未开通 405；**勿**当成接口下线或任务过期） |
 | 1 | `TIMEOUT` | 任务仍在处理，搜索也可能是没有可保存的结果。不要立刻重跑。搜索的复用窗口大约只有 9 分钟，等满超时后再跑可能新建一条任务 |
-| 1 | `NETWORK_ERROR` / `HTTP_5xx` / `HTTP_429` | 命令内部已经重试过。退出后再失败就告诉用户稍后再试 |
+| 1 | `NETWORK_ERROR` / `HTTP_5xx` / `HTTP_429` / `HTTP_404` / `HTTP_410` | 命令内部已经重试过。传输层 410 与业务码 Gone（TOKEN 停用→`AUTH_ERROR`）不同。退出后再失败就告诉用户稍后再试 |
 | 1 | `PLAN_LIMIT` | 套餐单次条数超限（常见于包月）。**禁止同参重试**。转述 `message`；可建议降 `--limit`（搜索/作品≤30，评论≤40）或到官网升级按量；**须用户同意后再跑** |
 | 1 | `INSUFFICIENT_BALANCE` | 余额不足（搜索常为后端 16，作品/评论常为 15）。**禁止同参重试**。引导官网充值 |
 | 1 | `RATE_LIMITED` | 短时间提交过多（作品/评论常为 2；搜索可能为 1 + 文案）。**禁止立即重试** |
 | 1 | `DAILY_LIMIT` | 今日消费已达每日上限（后端 18）。**禁止同参重试**。明日再试或到官网调整限额 |
-| 1 | 其它十进制数字 | 把 `message` 原样转告 |
-| 1 | `API_ERROR` / `UNKNOWN` | 转告 `message`，建议联系官网 |
+| 1 | `API_ERROR` / `UNKNOWN` | 未映射业务码已收成 `API_ERROR`（不再裸透数字）。转告 `message`，建议联系官网 |
 
 `error_code` 是字符串。查询还在处理、次数用尽时是 `TIMEOUT`，不是空结果。
 
@@ -243,4 +216,4 @@ node scripts/tiktok/search-cli.js --keyword "AI tutorial" --sort 1 --limit 20
 
 成功结果默认不写文件。需要留底时加 `--save`，或设置 `GUAIKEI_ENABLE_LOG=1`，文件写到系统临时目录的 `tiktok-guaikei/logs/`。POSIX 上权限是仅当前用户可读写；Windows 不使用这组权限位，靠临时目录本身的用户隔离。旧变量 `TT_GUAIKEI_ENABLE_LOG` 已废弃。
 
-开通 token 或更多帮助：[TikTok 热门舆情监测API](https://www.guaikei.com)。
+开通 token 或更多帮助：[TikTok 实时监控数据接口](https://www.guaikei.com)。
